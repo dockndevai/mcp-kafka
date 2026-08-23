@@ -1,34 +1,33 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.dockndevai/mcp-kafka",
-  "description": "Model Context Protocol server for Apache Kafka — monitor and manage clusters, topics, and consumer groups with security modes and access-control flags.",
-  "status": "active",
+  "description": "Apache Kafka monitoring & management for AI agents (with consumer lag) — governed.",
+  "version": "0.1.0",
   "repository": {
     "url": "https://github.com/dockndevai/mcp-kafka",
     "source": "github"
   },
-  "version": "0.1.0",
   "packages": [
     {
-      "registry_type": "npm",
-      "registry_base_url": "https://registry.npmjs.org",
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@dockndevai/mcp-kafka",
       "version": "0.1.0",
       "transport": {
         "type": "stdio"
       },
-      "environment_variables": [
+      "environmentVariables": [
         {
           "name": "KAFKA_BROKERS",
           "description": "Comma-separated broker list (host:port).",
-          "is_required": true,
-          "is_secret": false
+          "isRequired": true,
+          "isSecret": false
         },
         {
           "name": "KAFKA_MODE",
           "description": "Access mode: read-only | read-write | admin.",
-          "is_required": false,
-          "is_secret": false
+          "isRequired": false,
+          "isSecret": false
         }
       ]
     }
