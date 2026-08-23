@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/dockndevai/mcp-kafka/actions/workflows/ci.yml/badge.svg)](https://github.com/dockndevai/mcp-kafka/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![npm](https://img.shields.io/npm/v/@dockndevai/mcp-kafka)](https://www.npmjs.com/package/@dockndevai/mcp-kafka)
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server for **Apache Kafka**. It lets an MCP-capable client (Claude Desktop, Claude Code, etc.) **monitor and manage** Kafka clusters — topics, partitions, configs, and consumer groups (including lag) — with behaviour controlled entirely by flags.
 
@@ -35,43 +36,81 @@ Safe by default: it starts read-only, can be scoped to an allowlist of topics, p
 
 **Admin** (`admin`): `delete_topic`, `delete_consumer_group` (both need `KAFKA_ALLOW_DELETE`)
 
-## Use with your MCP client
+## Quickstart — add to your agent
 
-Works with Claude Code, Claude Desktop, Cursor, OpenAI Codex CLI, Windsurf, VS Code (Copilot), and any other MCP client — see **[docs/CLIENTS.md](docs/CLIENTS.md)** for per-client setup.
+Published on npm as [`@dockndevai/mcp-kafka`](https://www.npmjs.com/package/@dockndevai/mcp-kafka). No clone or build needed — your MCP client runs it on demand with `npx`. **Start in `read-only` mode**; see [`.env.example`](.env.example) for every variable and [docs/CLIENTS.md](docs/CLIENTS.md) for the full per-client guide.
 
-## Install
+**Claude Code** (CLI)
 
 ```bash
-npm install
-npm run build
+claude mcp add kafka -e KAFKA_BROKERS="localhost:9092" -e KAFKA_MODE="read-only" -- npx -y @dockndevai/mcp-kafka
 ```
 
-## Run with Claude Desktop / Claude Code
+**Claude Desktop · Cursor · Windsurf** — same block in `claude_desktop_config.json`, `.cursor/mcp.json`, or `~/.codeium/windsurf/mcp_config.json`:
 
 ```json
 {
   "mcpServers": {
     "kafka": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp-kafka/dist/index.js"],
+      "command": "npx",
+      "args": [
+        "-y",
+        "@dockndevai/mcp-kafka"
+      ],
       "env": {
-        "KAFKA_BROKERS": "broker1:9092,broker2:9092",
-        "KAFKA_MODE": "read-only",
-        "KAFKA_SSL": "true",
-        "KAFKA_SASL_MECHANISM": "scram-sha-512",
-        "KAFKA_SASL_USERNAME": "mcp",
-        "KAFKA_SASL_PASSWORD": "…"
+        "KAFKA_BROKERS": "localhost:9092",
+        "KAFKA_MODE": "read-only"
       }
     }
   }
 }
 ```
 
-### Example prompts
+**OpenAI Codex CLI** — in `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.kafka]
+command = "npx"
+args = ["-y", "@dockndevai/mcp-kafka"]
+env = { KAFKA_BROKERS = "localhost:9092", KAFKA_MODE = "read-only" }
+```
+
+**VS Code (GitHub Copilot, Agent mode)** — in `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "kafka": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@dockndevai/mcp-kafka"
+      ],
+      "env": {
+        "KAFKA_BROKERS": "localhost:9092",
+        "KAFKA_MODE": "read-only"
+      }
+    }
+  }
+}
+```
+
+## Example prompts
 
 - *"Which consumer groups have the most lag right now?"*
 - *"Describe the `orders` topic and show its offsets."*
 - *"Create a topic `events` with 6 partitions and 7-day retention."* (needs `read-write`)
+
+## Run from source (development)
+
+Prefer the published package above. To run from a clone:
+
+```bash
+npm install
+npm run build
+node dist/index.js   # with the environment variables set
+```
 
 ## Develop
 
