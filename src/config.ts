@@ -59,9 +59,12 @@ function parseSasl(): KafkaConnection["sasl"] {
 }
 
 export function loadConfig(): AppConfig {
-  const brokers = list("KAFKA_BROKERS");
+  // Default to a placeholder so the server can start and advertise its tools
+  // (introspection) even without config; connection errors surface on first use.
+  let brokers = list("KAFKA_BROKERS");
   if (brokers.length === 0) {
-    throw new Error("Missing required environment variable: KAFKA_BROKERS (comma-separated host:port list).");
+    process.stderr.write("[kafka-mcp] WARNING: KAFKA_BROKERS not set; using localhost:9092. Set it before running tools.\n");
+    brokers = ["localhost:9092"];
   }
   return {
     connection: {
