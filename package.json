@@ -1,7 +1,7 @@
 {
   "name": "@dockndevai/mcp-kafka",
   "mcpName": "io.github.dockndevai/mcp-kafka",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Model Context Protocol server for Apache Kafka — monitor and manage clusters, topics, and consumer groups with security modes and access-control flags.",
   "type": "module",
   "license": "MIT",
