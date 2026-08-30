@@ -19,7 +19,7 @@ export function buildServer(config: AppConfig): {
   const client = new KafkaClient(config.connection);
   const ctx: ToolContext = { client, policy };
 
-  const server = new McpServer({ name: "mcp-kafka", version: "0.1.1" });
+  const server = new McpServer({ name: "mcp-kafka", version: "0.1.2" });
 
   const enabled: string[] = [];
   for (const tool of ALL_TOOLS) {
