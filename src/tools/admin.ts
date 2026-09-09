@@ -16,7 +16,7 @@ export const adminTools: ToolDef[] = [
         "Permanently delete a topic and its data. Requires admin mode AND KAFKA_ALLOW_DELETE=true. Irreversible.",
       inputSchema: { topic: z.string().describe("Topic name") },
     },
-    handler: async (args, { client, policy }) => {
+    handler: async (args, { client, policy, confirm }) => {
       const topic = args.topic as string;
       const { dryRun } = policy.guard({
         tool: "delete_topic",
@@ -25,6 +25,8 @@ export const adminTools: ToolDef[] = [
         destructive: true,
       });
       if (dryRun) return textResult(`[dry-run] Would delete topic '${topic}'.`);
+      const ok = await confirm.confirm({ action: "delete topic (and its data)", target: topic });
+      if (!ok.approved) return textResult(`Deletion cancelled — ${ok.reason}.`);
       await client.deleteTopic(topic);
       return jsonResult({ deleted: true, topic });
     },
@@ -38,7 +40,7 @@ export const adminTools: ToolDef[] = [
         "Delete a consumer group (must have no active members). Requires admin mode AND KAFKA_ALLOW_DELETE=true.",
       inputSchema: { groupId: z.string().describe("Consumer group id") },
     },
-    handler: async (args, { client, policy }) => {
+    handler: async (args, { client, policy, confirm }) => {
       const groupId = args.groupId as string;
       const { dryRun } = policy.guard({
         tool: "delete_consumer_group",
@@ -46,6 +48,8 @@ export const adminTools: ToolDef[] = [
         destructive: true,
       });
       if (dryRun) return textResult(`[dry-run] Would delete consumer group '${groupId}'.`);
+      const ok = await confirm.confirm({ action: "delete consumer group", target: groupId });
+      if (!ok.approved) return textResult(`Deletion cancelled — ${ok.reason}.`);
       const result = await client.deleteGroup(groupId);
       return jsonResult({ deleted: true, groupId, result });
     },

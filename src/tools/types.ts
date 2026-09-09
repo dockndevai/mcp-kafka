@@ -1,10 +1,13 @@
 import type { ZodRawShape } from "zod";
+import type { Confirmer } from "../elicit.js";
 import type { KafkaClient } from "../kafka/client.js";
 import type { Capability, SecurityPolicy } from "../security.js";
 
 export interface ToolContext {
   client: KafkaClient;
   policy: SecurityPolicy;
+  /** Human-in-the-loop confirmation for destructive ops (no-op fallback when the client can't elicit). */
+  confirm: Confirmer;
 }
 
 export interface ToolResult {
