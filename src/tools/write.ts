@@ -93,7 +93,7 @@ export const writeTools: ToolDef[] = [
         to: z.enum(["earliest", "latest"]).describe("Reset target"),
       },
     },
-    handler: async (args, { client, policy }) => {
+    handler: async (args, { client, policy, confirm }) => {
       const topic = args.topic as string;
       const groupId = args.groupId as string;
       const earliest = (args.to as string) === "earliest";
@@ -104,6 +104,8 @@ export const writeTools: ToolDef[] = [
       });
       if (dryRun)
         return textResult(`[dry-run] Would reset group '${groupId}' on '${topic}' to ${args.to}.`);
+      const ok = await confirm.confirm({ action: "reset consumer group offsets (affects redelivery)", target: groupId, details: { topic, to: args.to as string } });
+      if (!ok.approved) return textResult(`Reset cancelled — ${ok.reason}.`);
       await client.resetGroupOffsets(groupId, topic, earliest);
       return jsonResult({ reset: true, groupId, topic, to: args.to });
     },

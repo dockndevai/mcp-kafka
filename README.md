@@ -27,6 +27,7 @@ Safe by default: it starts read-only, can be scoped to an allowlist of topics, p
 | Can it delete? | `KAFKA_ALLOW_DELETE` | `false` | `delete_topic` / `delete_consumer_group` need this **and** admin mode. |
 | Preview without touching the cluster | `KAFKA_DRY_RUN` | `false` | Write/admin tools validate + log intent, then return. |
 | Audit trail | `KAFKA_AUDIT_LOG` | `true` | Emits a JSON line to stderr per guarded operation. |
+| Interactive confirmation | *(automatic)* | — | Destructive & high-impact actions prompt the human to approve via MCP elicitation before running; clients without elicitation fall back to the `*_ALLOW_*` gate. |
 
 ## Tools
 
