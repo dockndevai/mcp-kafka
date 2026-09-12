@@ -14,7 +14,7 @@ export const writeTools: ToolDef[] = [
         numPartitions: z.number().int().min(1).optional().describe("Partition count (default 1)"),
         replicationFactor: z.number().int().min(1).optional().describe("Replication factor (default 1)"),
         configs: z
-          .record(z.string())
+          .record(z.string(), z.string())
           .optional()
           .describe("Topic configs, e.g. { \"retention.ms\": \"604800000\" }"),
       },
@@ -64,7 +64,7 @@ export const writeTools: ToolDef[] = [
       description: "Update one or more topic-level configuration entries.",
       inputSchema: {
         topic: z.string().describe("Topic name"),
-        configs: z.record(z.string()).describe("Config entries to set, e.g. { \"retention.ms\": \"86400000\" }"),
+        configs: z.record(z.string(), z.string()).describe("Config entries to set, e.g. { \"retention.ms\": \"86400000\" }"),
       },
     },
     handler: async (args, { client, policy }) => {
