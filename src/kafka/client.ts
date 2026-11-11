@@ -3,6 +3,7 @@
  * exposes the monitoring/management operations the tools need, including
  * consumer-group lag computation.
  */
+import { createHash } from "node:crypto";
 import { Kafka, type Admin, type ITopicConfig, type SASLOptions, logLevel } from "kafkajs";
 import type { KafkaConnection } from "../config.js";
 
@@ -81,6 +82,40 @@ export class KafkaClient {
   async topicOffsets(topic: string) {
     const admin = await this.getAdmin();
     return admin.fetchTopicOffsets(topic);
+  }
+
+  /**
+   * Version token for a topic, pinned across an approval prompt: partition layout (ids + replicas)
+   * and each partition's earliest offset. kafkajs exposes no topic UUID, so a recreate that yields the
+   * same layout on a topic whose earliest offsets were already 0 is not distinguishable.
+   */
+  async topicVersion(topic: string): Promise<string | undefined> {
+    const admin = await this.getAdmin();
+    const md = await admin.fetchTopicMetadata({ topics: [topic] });
+    const t = md.topics[0];
+    if (!t) return undefined;
+    const low = new Map((await admin.fetchTopicOffsets(topic)).map((o) => [o.partition, o.low]));
+    const layout = t.partitions
+      .map((p) => `${p.partitionId}:${[...p.replicas].sort().join(",")}:${low.get(p.partitionId) ?? "?"}`)
+      .sort();
+    return createHash("sha256").update(layout.join("|")).digest("hex").slice(0, 12);
+  }
+
+  /** Version token for a consumer group: its state and member set. */
+  async groupVersion(groupId: string): Promise<string | undefined> {
+    const admin = await this.getAdmin();
+    const g = (await admin.describeGroups([groupId])).groups[0];
+    if (!g) return undefined;
+    const members = g.members.map((m) => m.memberId).sort();
+    return createHash("sha256").update(`${g.state}|${members.join(",")}`).digest("hex").slice(0, 12);
+  }
+
+  /** Version token for a group's committed offsets on one topic. */
+  async groupOffsetsVersion(groupId: string, topic: string): Promise<string | undefined> {
+    const admin = await this.getAdmin();
+    const rows = await admin.fetchOffsets({ groupId, topics: [topic] });
+    const parts = rows.flatMap((r) => r.partitions.map((p) => `${p.partition}:${p.offset}`)).sort();
+    return createHash("sha256").update(parts.join("|")).digest("hex").slice(0, 12);
   }
 
   async listGroups() {

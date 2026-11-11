@@ -82,6 +82,7 @@ export function loadConfig(): AppConfig {
       allowDelete: bool("KAFKA_ALLOW_DELETE", false),
       dryRun: bool("KAFKA_DRY_RUN", false),
       auditLog: bool("KAFKA_AUDIT_LOG", true),
+      requireHumanApproval: bool("KAFKA_REQUIRE_HUMAN_APPROVAL", false),
     },
   };
 }
