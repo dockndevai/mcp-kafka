@@ -16,6 +16,12 @@ any other privileged automation and grant it the least access it needs.
   can touch at all.
 - **Gate deletion explicitly.** `delete_topic` and `delete_consumer_group` require
   both `admin` mode and `KAFKA_ALLOW_DELETE=true`.
+- **Require a human for destructive ops.** Set `KAFKA_REQUIRE_HUMAN_APPROVAL=true` so `delete_topic`,
+  `delete_consumer_group` and offset resets are refused when the client cannot show an approval prompt.
+  Each approval is bound to the exact tool and arguments (fingerprint) and to the target's version
+  (partition layout / group membership / committed offsets); if the target changed while the human was
+  deciding, the action is refused. `delete_topic` also asks the human to type the topic name. Approval
+  receipts are written to the audit log (`"audit":"approval"`, with `approvedBy` = `human` or `flag-only`).
 - **Preview with dry-run.** `KAFKA_DRY_RUN=true` validates and logs write intent
   without contacting the cluster.
 - **Keep the audit log on.** `KAFKA_AUDIT_LOG=true` (default) writes a JSON line

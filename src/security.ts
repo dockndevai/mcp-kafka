@@ -35,6 +35,8 @@ export interface SecurityConfig {
   dryRun: boolean;
   /** Emit a JSON audit line to stderr per guarded operation. */
   auditLog: boolean;
+  /** Refuse destructive ops that no human can approve (no elicitation support) instead of trusting the flags alone. */
+  requireHumanApproval: boolean;
 }
 
 export class PolicyError extends Error {

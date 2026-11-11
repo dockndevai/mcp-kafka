@@ -25,7 +25,12 @@ export const adminTools: ToolDef[] = [
         destructive: true,
       });
       if (dryRun) return textResult(`[dry-run] Would delete topic '${topic}'.`);
-      const ok = await confirm.confirm({ action: "delete topic (and its data)", target: topic });
+      const ok = await confirm.confirm({
+        action: "delete topic (and its data)",
+        target: topic,
+        typed: true,
+        probe: () => client.topicVersion(topic),
+      });
       if (!ok.approved) return textResult(`Deletion cancelled — ${ok.reason}.`);
       await client.deleteTopic(topic);
       return jsonResult({ deleted: true, topic });
@@ -48,7 +53,11 @@ export const adminTools: ToolDef[] = [
         destructive: true,
       });
       if (dryRun) return textResult(`[dry-run] Would delete consumer group '${groupId}'.`);
-      const ok = await confirm.confirm({ action: "delete consumer group", target: groupId });
+      const ok = await confirm.confirm({
+        action: "delete consumer group",
+        target: groupId,
+        probe: () => client.groupVersion(groupId),
+      });
       if (!ok.approved) return textResult(`Deletion cancelled — ${ok.reason}.`);
       const result = await client.deleteGroup(groupId);
       return jsonResult({ deleted: true, groupId, result });

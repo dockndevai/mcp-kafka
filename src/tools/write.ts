@@ -104,7 +104,12 @@ export const writeTools: ToolDef[] = [
       });
       if (dryRun)
         return textResult(`[dry-run] Would reset group '${groupId}' on '${topic}' to ${args.to}.`);
-      const ok = await confirm.confirm({ action: "reset consumer group offsets (affects redelivery)", target: groupId, details: { topic, to: args.to as string } });
+      const ok = await confirm.confirm({
+        action: "reset consumer group offsets (affects redelivery)",
+        target: groupId,
+        details: { topic, to: args.to as string },
+        probe: () => client.groupOffsetsVersion(groupId, topic),
+      });
       if (!ok.approved) return textResult(`Reset cancelled — ${ok.reason}.`);
       await client.resetGroupOffsets(groupId, topic, earliest);
       return jsonResult({ reset: true, groupId, topic, to: args.to });
