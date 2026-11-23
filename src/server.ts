@@ -19,7 +19,7 @@ export function buildServer(config: AppConfig): {
 } {
   const policy = new SecurityPolicy(config.security);
   const client = new KafkaClient(config.connection);
-  const server = new McpServer({ name: "mcp-kafka", version: "0.4.0" });
+  const server = new McpServer({ name: "mcp-kafka", version: "0.4.1" });
   const guard = new GuardClient(loadGuardConfig());
   const confirmer = makeConfirmer(server, {
     name: "mcp-kafka",
